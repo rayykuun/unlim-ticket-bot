@@ -13,12 +13,17 @@ module.exports = async (interaction, client, handler) => {
   if (interaction.customId !== "asa_ticket") return;
 
   try {
-    const categoryId = "1257383112069873695"; // Stellen Sie sicher, dass dies die korrekte Kategorie-ID für ASA-Tickets ist
+    // Sofortige Antwort, um die Interaktion am Leben zu erhalten
+    await interaction.deferReply({ ephemeral: true });
+
+    const categoryId = "1257383112069873695"; // Ersetzen Sie dies durch die korrekte Kategorie-ID
 
     // Finde die nächste verfügbare Nummer für den Kanalnamen und die Ticket-ID
-    const lastTicket = await Ticket.findOne({ ticketId: /^ASA-/ }).sort({
-      openedAt: -1,
-    });
+    const lastTicket = await Ticket.findOne({ ticketId: /^ASA-/ })
+      .sort({
+        openedAt: -1,
+      })
+      .lean();
 
     let nextNumber = 1;
     if (lastTicket) {
@@ -29,7 +34,7 @@ module.exports = async (interaction, client, handler) => {
     const channelName = `🟡 asa-${nextNumber.toString().padStart(4, "0")}`;
 
     // Finde alle Moderatoren
-    const moderators = await Moderator.find();
+    const moderators = await Moderator.find().lean();
     const moderatorIds = moderators.map((mod) => mod.userId);
 
     // Erstelle den Kanal
@@ -63,19 +68,6 @@ module.exports = async (interaction, client, handler) => {
 
     await newTicket.save();
 
-    // Sende eine Bestätigung an den Benutzer
-    const embed = new EmbedBuilder()
-      .setColor("#00ff00")
-      .setTitle("Ticket erstellt")
-      .setDescription(
-        `Dein Ticket wurde erfolgreich erstellt. Bitte gehe zu ${channel} um fortzufahren.`
-      );
-
-    await interaction.reply({
-      embeds: [embed],
-      ephemeral: true,
-    });
-
     // Erstelle die Buttons
     const closeButton = new ButtonBuilder()
       .setCustomId("close_ticket")
@@ -93,23 +85,46 @@ module.exports = async (interaction, client, handler) => {
     );
 
     // Sende eine Nachricht in den neuen Kanal
-    const embed2 = new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setColor("#00ff00")
       .setTitle(`${ticketId}`)
       .setDescription(
-        "Herzlich Willkommen zu Deinem Ticket!\nBitte schreibe schon mal dein Anliegen in den Chat.\nEin Admin wird sich so bald wie möglich darum kümmern.\n\nSollte nach 2h keine Nachricht in diesem Ticket geschrieben werden, wird das Ticket geschlossen."
-      );
+        "Herzlich Willkommen zu Deinem ASA Ticket!\nBitte schreibe schon mal dein Anliegen in den Chat.\nEin Admin wird sich so bald wie möglich darum kümmern.\n\nSollte nach 2h keine Nachricht in diesem Ticket geschrieben werden, wird das Ticket geschlossen."
+      )
+      .setFooter({
+        text: "🔒 = Ticket schließen. \n🔔 = Reminder.",
+      });
+
     await channel.send({
-      content: `<@&1211393369004052491> ${interaction.user}`,
-      embeds: [embed2],
+      content: `<@&1188598586544504843> ${interaction.user}`, // Ersetzen Sie ADMIN_ROLE_ID durch die tatsächliche Admin-Rollen-ID
+      embeds: [embed],
       components: [row],
     });
-  } catch (error) {
-    console.error("Fehler beim Erstellen des Ticket-Kanals:", error);
-    await interaction.reply({
-      content:
-        "Es gab einen Fehler beim Erstellen deines Tickets. Bitte versuche es später erneut oder kontaktiere einen Administrator.",
+
+    // Sende eine Bestätigung an den Benutzer
+    const embed2 = new EmbedBuilder()
+      .setColor("#00ff00")
+      .setTitle("ASA Ticket erstellt")
+      .setDescription(
+        `Dein ASA Ticket wurde erfolgreich erstellt. Bitte gehe zu ${channel} um fortzufahren.`
+      );
+
+    await interaction.editReply({
+      embeds: [embed2],
       ephemeral: true,
     });
+  } catch (error) {
+    console.error("Fehler beim Erstellen des ASA Ticket-Kanals:", error);
+
+    // Versuche, eine Fehlerantwort zu senden
+    try {
+      await interaction.editReply({
+        content:
+          "Es gab einen Fehler beim Erstellen deines ASA Tickets. Bitte versuche es später erneut oder kontaktiere einen Administrator.",
+        ephemeral: true,
+      });
+    } catch (replyError) {
+      console.error("Fehler beim Senden der Fehlerantwort:", replyError);
+    }
   }
 };

@@ -1,5 +1,5 @@
 const { EmbedBuilder, AttachmentBuilder } = require("discord.js");
-const { Ticket } = require("../../mongoSchema");
+const { Ticket, Moderator } = require("../../mongoSchema");
 const discordTranscripts = require("discord-html-transcripts");
 
 module.exports = async (interaction, client, handler) => {
@@ -7,6 +7,16 @@ module.exports = async (interaction, client, handler) => {
   if (interaction.customId !== "close_ticket") return;
 
   try {
+    const isModerator = await Moderator.findOne({
+      userId: interaction.user.id,
+    });
+    if (!isModerator) {
+      return interaction.reply({
+        content: "Nur Moderatoren können Tickets schließen.",
+        ephemeral: true,
+      });
+    }
+
     const ticket = await Ticket.findOne({ channelId: interaction.channel.id });
 
     if (!ticket) {
@@ -46,7 +56,9 @@ module.exports = async (interaction, client, handler) => {
     });
 
     // Sende das Transkript an einen Log-Kanal (ersetzen Sie 'LOG_CHANNEL_ID' durch die tatsächliche ID)
-    const logChannel = interaction.guild.channels.cache.get("LOG_CHANNEL_ID");
+    const logChannel = interaction.guild.channels.cache.get(
+      "1257383155745296384"
+    );
     if (logChannel) {
       const logEmbed = new EmbedBuilder()
         .setColor("#0099ff")

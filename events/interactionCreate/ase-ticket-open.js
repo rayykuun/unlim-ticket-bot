@@ -18,17 +18,12 @@ module.exports = async (interaction, client, handler) => {
 
     const categoryId = "1257383112069873695"; // Überprüfen Sie, ob diese ID korrekt ist
 
-    // Logging für Debugging
-    console.log("Suche nach dem letzten Ticket...");
-
     // Finde die nächste verfügbare Nummer für den Kanalnamen und die Ticket-ID
     const lastTicket = await Ticket.findOne({ ticketId: /^ASE-/ })
       .sort({
         openedAt: -1,
       })
       .lean(); // Verwenden Sie .lean() für schnellere Abfragen
-
-    console.log("Letztes Ticket gefunden:", lastTicket);
 
     let nextNumber = 1;
     if (lastTicket) {
@@ -43,8 +38,6 @@ module.exports = async (interaction, client, handler) => {
     // Finde alle Moderatoren
     const moderators = await Moderator.find().lean();
     const moderatorIds = moderators.map((mod) => mod.userId);
-
-    console.log("Moderatoren gefunden:", moderatorIds.length);
 
     // Erstelle den Kanal
     const channel = await interaction.guild.channels.create({
@@ -67,8 +60,6 @@ module.exports = async (interaction, client, handler) => {
       ],
     });
 
-    console.log("Kanal erstellt:", channel.id);
-
     // Speichere das Ticket in der Datenbank
     const newTicket = new Ticket({
       ticketId: ticketId,
@@ -78,8 +69,6 @@ module.exports = async (interaction, client, handler) => {
     });
 
     await newTicket.save();
-
-    console.log("Ticket in Datenbank gespeichert");
 
     // Erstelle die Buttons
     const closeButton = new ButtonBuilder()
@@ -113,8 +102,6 @@ module.exports = async (interaction, client, handler) => {
       embeds: [embed],
       components: [row],
     });
-
-    console.log("Nachricht im Kanal gesendet");
 
     // Sende eine Bestätigung an den Benutzer
     const embed2 = new EmbedBuilder()

@@ -37,11 +37,12 @@ module.exports = {
           "**DEUTSCH:**\n" +
             "Bitte Wähle unten aus zu Welchem Spielmodus du Hilfe benötigst.\n" +
             "beachte dabei unsere Ticket zeiten:\n" +
-            "- MO - SA 13 -21 UHR\n\n" +
+            "- MO - SA 13 -21 UHR\n- SONTAG Ruhetag\n" +
             "**ENGLISH:**\n" +
             "Please choose below which game mode you need help with.\n" +
             "Note that our ticket opening times are:\n" +
-            "- America/New_York: MO - SA 8am - 4pm"
+            "- America/New_York: MO - SA 8am - 4pm\n" +
+            "- Sunday: Closed"
         )
         .setFooter({
           text: "Ticket system für #unlimited-evolution.",

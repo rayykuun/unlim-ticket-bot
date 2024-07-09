@@ -34,6 +34,9 @@ module.exports = async (interaction, client, handler) => {
     const reminderEmbed = new EmbedBuilder()
       .setColor("#FFA500")
       .setTitle("bitte antworte auf dein Ticket!")
+      .setDescription(
+        "Wir haben seit längerer Zeit keine Antwort / Nachricht erhalten. \nSollten wir nach **2 Stunden** keine Nachricht erhalten, werden wir das Ticket unkommentiert schließen!"
+      )
       .setFooter({ text: `id: ${ticket.ticketId}` })
       .setTimestamp();
 

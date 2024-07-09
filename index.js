@@ -19,7 +19,7 @@ new CommandKit({
   // validationsPath: path.join(__dirname, "validations"),
   devGuildIds: ["1188598186500173844"],
   devUserIds: ["283322500325179394"],
-  // devRoleIds: ["DEV_ROLE_ID_1", "DEV_ROLE_ID_2"],
+  devRoleIds: ["1188598586544504843"],
   skipBuiltInValidations: true,
   bulkRegister: true,
 });
