@@ -1,21 +1,13 @@
 const { EmbedBuilder, AttachmentBuilder } = require("discord.js");
-const { Ticket, Moderator } = require("../../mongoSchema");
+const { Ticket } = require("../../mongoSchema");
 const discordTranscripts = require("discord-html-transcripts");
 
 module.exports = async (interaction, client, handler) => {
-  if (!interaction.isButton()) return;
-  if (interaction.customId !== "close_ticket") return;
+  if (!interaction.isModalSubmit()) return;
+  if (interaction.customId !== "close_ticket_modal") return;
 
   try {
-    const isModerator = await Moderator.findOne({
-      userId: interaction.user.id,
-    });
-    if (!isModerator) {
-      return interaction.reply({
-        content: "Nur Moderatoren können Tickets schließen.",
-        ephemeral: true,
-      });
-    }
+    const reason = interaction.fields.getTextInputValue("close_reason");
 
     const ticket = await Ticket.findOne({ channelId: interaction.channel.id });
 
@@ -28,8 +20,7 @@ module.exports = async (interaction, client, handler) => {
 
     // Informiere den Benutzer
     await interaction.reply({
-      content:
-        "Das Ticket wird in 5 Sekunden geschlossen. Ein Transkript wird erstellt.",
+      content: `Das Ticket wird in 5 Sekunden geschlossen. Grund: ${reason}`,
       ephemeral: false,
     });
 
@@ -37,7 +28,7 @@ module.exports = async (interaction, client, handler) => {
     const transcript = await discordTranscripts.createTranscript(
       interaction.channel,
       {
-        limit: -1, // Unbegrenzte Nachrichten
+        limit: -1,
         fileName: `ticket-${ticket.ticketId}.html`,
         poweredBy: false,
         saveImages: true,
@@ -55,7 +46,7 @@ module.exports = async (interaction, client, handler) => {
       name: `transcript-${ticket.ticketId}.html`,
     });
 
-    // Sende das Transkript an einen Log-Kanal (ersetzen Sie 'LOG_CHANNEL_ID' durch die tatsächliche ID)
+    // Sende das Transkript an einen Log-Kanal
     const logChannel = interaction.guild.channels.cache.get(
       "1257383155745296384"
     );
@@ -67,7 +58,8 @@ module.exports = async (interaction, client, handler) => {
           { name: "Geschlossen von", value: interaction.user.tag },
           { name: "Geöffnet von", value: `<@${ticket.openedBy}>` },
           { name: "Geöffnet am", value: ticket.openedAt.toLocaleString() },
-          { name: "Geschlossen am", value: new Date().toLocaleString() }
+          { name: "Geschlossen am", value: new Date().toLocaleString() },
+          { name: "Grund", value: reason }
         );
 
       await logChannel.send({
@@ -76,11 +68,29 @@ module.exports = async (interaction, client, handler) => {
       });
     }
 
+    // Sende eine DM an den Benutzer, der das Ticket geöffnet hat
+    try {
+      const user = await client.users.fetch(ticket.openedBy);
+      const dmEmbed = new EmbedBuilder()
+        .setColor("#0099ff")
+        .setTitle(`Dein Ticket wurde geschlossen: ${ticket.ticketId}`)
+        .addFields(
+          { name: "Geschlossen von", value: interaction.user.tag },
+          { name: "Geschlossen am", value: new Date().toLocaleString() },
+          { name: "Grund", value: reason }
+        );
+
+      await user.send({ embeds: [dmEmbed] });
+    } catch (error) {
+      console.error("Fehler beim Senden der DM:", error);
+    }
+
     // Aktualisiere das Ticket in der Datenbank
     ticket.status = "closed";
     ticket.closedBy = interaction.user.id;
     ticket.closedAt = new Date();
-    ticket.transcript = transcriptString; // Speichere das Transkript in der Datenbank
+    ticket.transcript = transcriptString;
+    ticket.closeReason = reason;
     await ticket.save();
 
     // Warte 5 Sekunden

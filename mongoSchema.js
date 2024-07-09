@@ -306,6 +306,9 @@ const ticketSchema = new mongoose.Schema({
   transcript: {
     type: String,
   },
+  closeReason: {
+    type: String,
+  },
 });
 
 const Ticket = mongoose.model("Ticket", ticketSchema);
