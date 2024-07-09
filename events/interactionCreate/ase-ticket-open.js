@@ -23,7 +23,7 @@ module.exports = async (interaction, client, handler) => {
       .sort({
         openedAt: -1,
       })
-      .lean(); // Verwenden Sie .lean() für schnellere Abfragen
+      .lean();
 
     let nextNumber = 1;
     if (lastTicket) {
@@ -36,28 +36,44 @@ module.exports = async (interaction, client, handler) => {
     console.log("Neue Ticket-ID:", ticketId);
 
     // Finde alle Moderatoren
-    const moderators = await Moderator.find().lean();
+    const moderators = await Moderator.find({
+      userId: { $type: "string" },
+    }).lean();
     const moderatorIds = moderators.map((mod) => mod.userId);
+
+    console.log("Moderator IDs:", moderatorIds);
+
+    // Erstelle die Basis-Berechtigungsüberschreibungen
+    const permissionOverwrites = [
+      {
+        id: interaction.guild.id,
+        deny: [PermissionsBitField.Flags.ViewChannel],
+      },
+      {
+        id: interaction.user.id,
+        allow: [PermissionsBitField.Flags.ViewChannel],
+      },
+    ];
+
+    // Füge Moderatoren-Berechtigungen hinzu
+    for (const id of moderatorIds) {
+      try {
+        const user = await interaction.guild.members.fetch(id);
+        permissionOverwrites.push({
+          id: user.id,
+          allow: [PermissionsBitField.Flags.ViewChannel],
+        });
+      } catch (error) {
+        console.error(`Failed to fetch user for ID ${id}:`, error);
+      }
+    }
 
     // Erstelle den Kanal
     const channel = await interaction.guild.channels.create({
       name: channelName,
       type: ChannelType.GuildText,
       parent: categoryId,
-      permissionOverwrites: [
-        {
-          id: interaction.guild.id,
-          deny: [PermissionsBitField.Flags.ViewChannel],
-        },
-        {
-          id: interaction.user.id,
-          allow: [PermissionsBitField.Flags.ViewChannel],
-        },
-        ...moderatorIds.map((id) => ({
-          id: id,
-          allow: [PermissionsBitField.Flags.ViewChannel],
-        })),
-      ],
+      permissionOverwrites: permissionOverwrites,
     });
 
     // Speichere das Ticket in der Datenbank
