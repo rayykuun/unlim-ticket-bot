@@ -1,3 +1,5 @@
 /node_modules/
-config.json
 database.js
+config.json
+package-lock.json
+package.json
