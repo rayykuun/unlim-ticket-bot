@@ -309,6 +309,7 @@ const ticketSchema = new mongoose.Schema({
   closeReason: {
     type: String,
   },
+  feedbackMessageId: String,
 });
 
 const Ticket = mongoose.model("Ticket", ticketSchema);
@@ -363,6 +364,37 @@ const userResponseSchema = new mongoose.Schema({
 
 const UserResponse = mongoose.model("UserResponse", userResponseSchema);
 
+const ticketCloseStatsSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  closedTickets: {
+    type: Number,
+    default: 0,
+  },
+  lastClosedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const TicketCloseStats = mongoose.model(
+  "TicketCloseStats",
+  ticketCloseStatsSchema
+);
+
+const ticketFeedbackSchema = new mongoose.Schema({
+  userId: String,
+  ticketId: String,
+  feedbackType: String,
+  feedbackText: String,
+  timestamp: Date,
+});
+
+const TicketFeedback = mongoose.model("TicketFeedback", ticketFeedbackSchema);
+
 module.exports = {
   Moderator,
   LogChannel,
@@ -378,4 +410,6 @@ module.exports = {
   Ticket,
   AutoResponse,
   UserResponse,
+  TicketCloseStats,
+  TicketFeedback,
 };

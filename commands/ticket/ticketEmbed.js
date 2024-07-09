@@ -50,11 +50,13 @@ module.exports = {
 
       const aseButton = new ButtonBuilder()
         .setCustomId("ase_ticket")
+        .setEmoji("<:ase_logo:1260299085207048242>")
         .setLabel("Ark: Survival Evolved")
         .setStyle(ButtonStyle.Primary);
 
       const asaButton = new ButtonBuilder()
         .setCustomId("asa_ticket")
+        .setEmoji("<:asa_logo:1260299426799554571>")
         .setLabel("ARK Survival Ascended")
         .setStyle(ButtonStyle.Primary);
 

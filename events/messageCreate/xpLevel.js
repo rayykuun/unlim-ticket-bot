@@ -14,14 +14,18 @@ module.exports = async (message, client) => {
       });
     }
 
+    // Füge 20 XP für jede Nachricht hinzu
     userXP.xp += 20;
 
-    const requiredXP = Math.floor(100 * Math.pow(1.7, userXP.level));
+    // Berechne das erforderliche XP für das nächste Level (250 XP pro Level)
+    const requiredXP = 250;
 
-    if (userXP.xp >= requiredXP) {
+    // Überprüfe, ob der Benutzer ein neues Level erreicht hat
+    while (userXP.xp >= requiredXP) {
       userXP.level++;
-      userXP.xp = 0; // Setze XP auf 0 anstatt den Überschuss zu berechnen
+      userXP.xp -= requiredXP;
 
+      // Sende eine Levelup-Nachricht
       message.channel.send(
         `Glückwunsch, ${message.author}! Du bist jetzt Level ${userXP.level}!`
       );

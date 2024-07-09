@@ -1,5 +1,11 @@
-const { EmbedBuilder, AttachmentBuilder } = require("discord.js");
-const { Ticket } = require("../../mongoSchema");
+const {
+  EmbedBuilder,
+  AttachmentBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  ActionRowBuilder,
+} = require("discord.js");
+const { Ticket, TicketCloseStats } = require("../../mongoSchema");
 const discordTranscripts = require("discord-html-transcripts");
 
 module.exports = async (interaction, client, handler) => {
@@ -17,6 +23,15 @@ module.exports = async (interaction, client, handler) => {
         ephemeral: true,
       });
     }
+
+    // Aktualisiere die Ticket-Schließ-Statistiken
+    let stats = await TicketCloseStats.findOne({ userId: interaction.user.id });
+    if (!stats) {
+      stats = new TicketCloseStats({ userId: interaction.user.id });
+    }
+    stats.closedTickets += 1;
+    stats.lastClosedAt = new Date();
+    await stats.save();
 
     // Informiere den Benutzer
     await interaction.reply({
@@ -41,12 +56,7 @@ module.exports = async (interaction, client, handler) => {
     const transcriptBuffer = Buffer.from(await transcript.attachment);
     const transcriptString = transcriptBuffer.toString("utf-8");
 
-    // Erstelle einen Attachment aus dem Transkript
-    const attachment = new AttachmentBuilder(transcriptBuffer, {
-      name: `transcript-${ticket.ticketId}.html`,
-    });
-
-    // Sende das Transkript an einen Log-Kanal
+    // Sende nur die Nachricht an den Log-Kanal
     const logChannel = interaction.guild.channels.cache.get(
       "1257383155745296384"
     );
@@ -59,13 +69,14 @@ module.exports = async (interaction, client, handler) => {
           { name: "Geöffnet von", value: `<@${ticket.openedBy}>` },
           { name: "Geöffnet am", value: ticket.openedAt.toLocaleString() },
           { name: "Geschlossen am", value: new Date().toLocaleString() },
-          { name: "Grund", value: reason }
+          { name: "Grund", value: reason },
+          {
+            name: `Geschlossene Tickets (von ${interaction.user.tag})`,
+            value: `${stats.closedTickets}`,
+          }
         );
 
-      await logChannel.send({
-        embeds: [logEmbed],
-        files: [attachment],
-      });
+      await logChannel.send({ embeds: [logEmbed] });
     }
 
     // Sende eine DM an den Benutzer, der das Ticket geöffnet hat
@@ -80,7 +91,14 @@ module.exports = async (interaction, client, handler) => {
           { name: "Grund", value: reason }
         );
 
-      await user.send({ embeds: [dmEmbed] });
+      const feedbackMessage = await user.send({
+        embeds: [dmEmbed],
+      });
+
+      // Speichern Sie die Message-ID in der Datenbank
+      await Ticket.findByIdAndUpdate(ticket._id, {
+        feedbackMessageId: feedbackMessage.id,
+      });
     } catch (error) {
       console.error("Fehler beim Senden der DM:", error);
     }
