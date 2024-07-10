@@ -6,11 +6,11 @@ const {
   ButtonBuilder,
   ButtonStyle,
 } = require("discord.js");
-const { Moderator, Ticket } = require("../../mongoSchema");
+const { Moderator, Ticket } = require("../../../mongoSchema");
 
 module.exports = async (interaction, client, handler) => {
   if (!interaction.isButton()) return;
-  if (interaction.customId !== "asa_ticket") return;
+  if (interaction.customId !== "ase_ticket") return;
 
   try {
     // Sofortige Antwort, um die Interaktion am Leben zu erhalten
@@ -19,7 +19,7 @@ module.exports = async (interaction, client, handler) => {
     const categoryId = "1257383112069873695"; // Überprüfen Sie, ob diese ID korrekt ist
 
     // Finde die nächste verfügbare Nummer für den Kanalnamen und die Ticket-ID
-    const lastTicket = await Ticket.findOne({ ticketId: /^ASA-/ })
+    const lastTicket = await Ticket.findOne({ ticketId: /^ASE-/ })
       .sort({
         openedAt: -1,
       })
@@ -30,8 +30,8 @@ module.exports = async (interaction, client, handler) => {
       nextNumber = parseInt(lastTicket.ticketId.split("-")[1]) + 1;
     }
 
-    const ticketId = `ASA-${nextNumber.toString().padStart(4, "0")}`;
-    const channelName = `🟡 asa-${nextNumber.toString().padStart(4, "0")}`;
+    const ticketId = `ASE-${nextNumber.toString().padStart(4, "0")}`;
+    const channelName = `🟢 ase-${nextNumber.toString().padStart(4, "0")}`;
 
     console.log("Neue Ticket-ID:", ticketId);
 
@@ -107,14 +107,14 @@ module.exports = async (interaction, client, handler) => {
       .setColor("#00ff00")
       .setTitle(`${ticketId}`)
       .setDescription(
-        "Herzlich Willkommen zu Deinem ASA Ticket!\nBitte schreibe schon mal dein Anliegen in den Chat.\nEin Admin wird sich so bald wie möglich darum kümmern.\n\nSollte nach 2h keine Nachricht in diesem Ticket geschrieben werden, wird das Ticket geschlossen."
+        "Herzlich Wilkommen zu Deinem Ticket!\nBitte schreibe schonmal dein Anliegen in den Chat.\nein Admin wird sich so bald wie möglich drumm kümmern.\n\nsollte nach 2h keine Nachricht in diesem ticket geschrieben werden wird das Ticket geschlossen"
       )
       .setFooter({
-        text: "🔒 = Ticket schließen. \n🔔 = Reminder.",
+        text: "🔒 = ticket schliesen. \n🔔 = reminder.",
       });
 
     await channel.send({
-      content: `<@&1188598586544504843> ${interaction.user}`,
+      content: `<@&1211393369004052491> ${interaction.user}`,
       embeds: [embed],
       components: [row],
     });
@@ -122,9 +122,9 @@ module.exports = async (interaction, client, handler) => {
     // Sende eine Bestätigung an den Benutzer
     const embed2 = new EmbedBuilder()
       .setColor("#00ff00")
-      .setTitle("ASA Ticket erstellt")
+      .setTitle("Ticket erstellt")
       .setDescription(
-        `Dein ASA Ticket wurde erfolgreich erstellt. Bitte gehe zu ${channel} um fortzufahren.`
+        `Dein Ticket wurde erfolgreich erstellt. Bitte gehe zu ${channel} um fortzufahren.`
       );
 
     await interaction.editReply({
@@ -132,13 +132,13 @@ module.exports = async (interaction, client, handler) => {
       ephemeral: true,
     });
   } catch (error) {
-    console.error("Fehler beim Erstellen des ASA Ticket-Kanals:", error);
+    console.error("Fehler beim Erstellen des Ticket-Kanals:", error);
 
     // Versuche, eine Fehlerantwort zu senden
     try {
       await interaction.editReply({
         content:
-          "Es gab einen Fehler beim Erstellen deines ASA Tickets. Bitte versuche es später erneut oder kontaktiere einen Administrator.",
+          "Es gab einen Fehler beim Erstellen deines Tickets. Bitte versuche es später erneut oder kontaktiere einen Administrator.",
         ephemeral: true,
       });
     } catch (replyError) {

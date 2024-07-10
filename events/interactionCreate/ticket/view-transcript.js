@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { Ticket, Moderator } = require("../../mongoSchema");
+const { Ticket, Moderator } = require("../../../mongoSchema");
 
 module.exports = async (interaction, client, handler) => {
   if (!interaction.isButton()) return;

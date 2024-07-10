@@ -1,6 +1,6 @@
 // In events/interactionCreate/ticket-feedback-modal.js
 
-const { TicketFeedback, Ticket } = require("../../mongoSchema");
+const { TicketFeedback, Ticket } = require("../../../mongoSchema");
 const { EmbedBuilder } = require("discord.js");
 
 module.exports = async (interaction) => {

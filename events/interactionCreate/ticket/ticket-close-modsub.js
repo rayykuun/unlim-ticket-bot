@@ -5,7 +5,7 @@ const {
   StringSelectMenuOptionBuilder,
   ActionRowBuilder,
 } = require("discord.js");
-const { Ticket, TicketCloseStats } = require("../../mongoSchema");
+const { Ticket, TicketCloseStats } = require("../../../mongoSchema");
 const discordTranscripts = require("discord-html-transcripts");
 
 module.exports = async (interaction, client, handler) => {

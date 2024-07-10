@@ -6,7 +6,7 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const { Ticket, Moderator } = require("../../mongoSchema");
+const { Ticket, Moderator } = require("../../../mongoSchema");
 const discordTranscripts = require("discord-html-transcripts");
 
 module.exports = async (interaction, client, handler) => {
