@@ -395,6 +395,21 @@ const ticketFeedbackSchema = new mongoose.Schema({
 
 const TicketFeedback = mongoose.model("TicketFeedback", ticketFeedbackSchema);
 
+const giveawaySchema = new mongoose.Schema({
+  messageId: String,
+  channelId: String,
+  guildId: String,
+  prize: String,
+  description: String,
+  winnerCount: Number,
+  requiredRoleId: String,
+  endsAt: Date,
+  hostId: String,
+  participants: [String],
+});
+
+const Giveaway = mongoose.model("Giveaway", giveawaySchema);
+
 module.exports = {
   Moderator,
   LogChannel,
@@ -412,4 +427,5 @@ module.exports = {
   UserResponse,
   TicketCloseStats,
   TicketFeedback,
+  Giveaway,
 };
