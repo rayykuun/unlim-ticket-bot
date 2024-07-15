@@ -60,6 +60,8 @@ module.exports = async (interaction, client, handler) => {
     const logChannel = interaction.guild.channels.cache.get(
       "1257383155745296384"
     );
+    const duration = (new Date() - ticket.openedAt) / 1000; // Duration in seconds
+    ticket.duration = duration;
     if (logChannel) {
       const logEmbed = new EmbedBuilder()
         .setColor("#0099ff")
@@ -69,6 +71,12 @@ module.exports = async (interaction, client, handler) => {
           { name: "Geöffnet von", value: `<@${ticket.openedBy}>` },
           { name: "Geöffnet am", value: ticket.openedAt.toLocaleString() },
           { name: "Geschlossen am", value: new Date().toLocaleString() },
+          {
+            name: "Dauer",
+            value: `${Math.floor(duration / 3600)} Stunden, ${Math.floor(
+              (duration % 3600) / 60
+            )} Minuten`,
+          },
           { name: "Grund", value: reason },
           {
             name: `Geschlossene Tickets (von ${interaction.user.tag})`,

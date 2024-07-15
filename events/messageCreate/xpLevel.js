@@ -1,4 +1,5 @@
 const { UserXP, LevelReward } = require("../../mongoSchema");
+const { EmbedBuilder } = require("discord.js");
 
 module.exports = async (message, client) => {
   if (message.author.bot) return;
@@ -14,23 +15,21 @@ module.exports = async (message, client) => {
       });
     }
 
-    // Füge 20 XP für jede Nachricht hinzu
-    userXP.xp += 20;
+    const xpGain = Math.floor(Math.random() * (25 - 15 + 1)) + 15;
+    userXP.xp += xpGain;
 
-    // Berechne das erforderliche XP für das nächste Level (250 XP pro Level)
-    const requiredXP = 250;
-
-    // Überprüfe, ob der Benutzer ein neues Level erreicht hat
-    while (userXP.xp >= requiredXP) {
+    if (userXP.xp >= 250) {
       userXP.level++;
-      userXP.xp -= requiredXP;
+      userXP.xp = 0;
 
-      // Sende eine Levelup-Nachricht
-      message.channel.send(
-        `Glückwunsch, ${message.author}! Du bist jetzt Level ${userXP.level}!`
-      );
+      const embed = new EmbedBuilder()
+        .setColor("#00FF00")
+        .setTitle("Level Up!")
+        .setDescription(
+          `Glückwunsch, ${message.author}! Du bist jetzt Level ${userXP.level}!`
+        )
+        .setThumbnail(message.author.displayAvatarURL());
 
-      // Überprüfe auf Belohnungen für das neue Level
       const reward = await LevelReward.findOne({
         guildId: message.guild.id,
         level: userXP.level,
@@ -40,11 +39,14 @@ module.exports = async (message, client) => {
         const role = message.guild.roles.cache.get(reward.roleId);
         if (role) {
           await message.member.roles.add(role);
-          message.channel.send(
-            `Du hast die Rolle ${role.name} für das Erreichen von Level ${userXP.level} erhalten!`
-          );
+          embed.addFields({
+            name: "Rollenbelohnung",
+            value: `Du hast die Rolle ${role.name} erhalten!`,
+          });
         }
       }
+
+      message.channel.send({ embeds: [embed] });
     }
 
     await userXP.save();

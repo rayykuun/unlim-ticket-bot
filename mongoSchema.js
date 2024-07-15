@@ -309,6 +309,10 @@ const ticketSchema = new mongoose.Schema({
   closeReason: {
     type: String,
   },
+  duration: {
+    type: Number,
+    default: 0,
+  },
   feedbackMessageId: String,
 });
 

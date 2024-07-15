@@ -41,8 +41,6 @@ module.exports = async (interaction, client, handler) => {
     }).lean();
     const moderatorIds = moderators.map((mod) => mod.userId);
 
-    console.log("Moderator IDs:", moderatorIds);
-
     // Erstelle die Basis-Berechtigungsüberschreibungen
     const permissionOverwrites = [
       {
@@ -97,17 +95,10 @@ module.exports = async (interaction, client, handler) => {
       .setEmoji("🔔")
       .setStyle(ButtonStyle.Primary);
 
-    const linkButton = new ButtonBuilder()
-      .setCustomId("link_asa")
-      .setEmoji("🔗")
-      .setStyle(ButtonStyle.Secondary)
-      .setTitle("INFOS");
-
     const row = new ActionRowBuilder().addComponents(
       closeButton,
       reminderButton
     );
-    const row2 = new ActionRowBuilder().addComponents(linkButton);
 
     // Sende eine Nachricht in den neuen Kanal
     const embed = new EmbedBuilder()
@@ -123,7 +114,7 @@ module.exports = async (interaction, client, handler) => {
     await channel.send({
       content: `<@&1188598586544504843> ${interaction.user}`,
       embeds: [embed],
-      components: [row, row2],
+      components: [row],
     });
 
     // Sende eine Bestätigung an den Benutzer

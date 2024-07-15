@@ -2,6 +2,7 @@ const { EmbedBuilder } = require("discord.js");
 const { MemberLog, LogChannel } = require("../../mongoSchema");
 
 module.exports = async (member, client) => {
+  console.log("member left event triggered");
   try {
     // Existing code for updating MemberLog
     const memberLog = await MemberLog.findOne({ userId: member.id });
