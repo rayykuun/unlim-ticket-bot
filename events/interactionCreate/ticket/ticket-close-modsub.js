@@ -57,9 +57,8 @@ module.exports = async (interaction, client, handler) => {
     const transcriptString = transcriptBuffer.toString("utf-8");
 
     // Sende nur die Nachricht an den Log-Kanal
-    const logChannel = interaction.guild.channels.cache.get(
-      "1257383155745296384"
-    );
+    const logChannel =
+      interaction.guild.channels.cache.get("990934234740977684");
     const duration = (new Date() - ticket.openedAt) / 1000; // Duration in seconds
     ticket.duration = duration;
     if (logChannel) {

@@ -52,7 +52,7 @@ module.exports = async (member, client, handler) => {
 
     await memberLog.save();
 
-    const welcomeChannelId = "1260259517753458718"; // Ersetzen Sie dies durch die tatsächliche Channel-ID
+    const welcomeChannelId = "990958851639607366"; // Ersetzen Sie dies durch die tatsächliche Channel-ID
     const welcomeChannel = member.guild.channels.cache.get(welcomeChannelId);
 
     if (welcomeChannel) {

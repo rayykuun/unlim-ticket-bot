@@ -23,7 +23,7 @@ module.exports = async (interaction, client, handler) => {
     });
 
     const member = interaction.member;
-    const role = interaction.guild.roles.cache.get("1188598586544504843");
+    const role = interaction.guild.roles.cache.get("990982500539043850");
     if (role) await member.roles.add(role);
   } catch (error) {
     console.error("Error processing rule acceptance:", error);

@@ -1,4 +1,10 @@
-const { Client, GatewayIntentBits, WebhookClient } = require("discord.js");
+const {
+  Client,
+  GatewayIntentBits,
+  WebhookClient,
+  Partials,
+} = require("discord.js");
+
 const { CommandKit } = require("commandkit");
 const path = require("path");
 const { token } = require("./config.json");
@@ -11,7 +17,9 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.GuildMessageReactions,
   ],
+  partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
 new CommandKit({
@@ -19,7 +27,7 @@ new CommandKit({
   commandsPath: path.join(__dirname, "commands"),
   eventsPath: path.join(__dirname, "events"),
   // validationsPath: path.join(__dirname, "validations"),
-  devGuildIds: ["1188598186500173844"],
+  devGuildIds: ["1188598186500173844", "990753854456995870"],
   devUserIds: ["283322500325179394"],
   devRoleIds: ["1188598586544504843"],
   skipBuiltInValidations: true,

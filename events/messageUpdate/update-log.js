@@ -7,6 +7,7 @@ const {
 const { LogChannel, MessageLog } = require("../../mongoSchema");
 
 module.exports = async (oldMessage, newMessage, client) => {
+  if (!oldMessage || !newMessage) return;
   // Ignoriere Nachrichten von Bots
   if (oldMessage.author.bot) return;
 
